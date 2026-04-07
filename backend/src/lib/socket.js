@@ -6,22 +6,34 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("⚡ User connected:", socket.id);
 
-  // 🔥 join room
+  // ✅ Join user room
   socket.on("join", (userId) => {
     socket.join(userId);
-    console.log(`User ${userId} joined room`);
+    console.log(`✅ User ${userId} joined room`);
   });
 
+  // ✅ Send message
+  socket.on("sendMessage", ({ senderId, receiverId, message }) => {
+    console.log("📩 Message:", message);
+
+    // send to receiver room
+    io.to(receiverId).emit("receiveMessage", {
+      senderId,
+      message,
+    });
+  });
+
+  // ❌ Disconnect
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    console.log("❌ User disconnected:", socket.id);
   });
 });
 
