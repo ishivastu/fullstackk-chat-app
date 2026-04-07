@@ -24,9 +24,5 @@ import messageRoutes from "./routes/messageRoutes.js";
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// ✅ Test route
-app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
-});
 
 export default app;
