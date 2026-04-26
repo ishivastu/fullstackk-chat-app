@@ -1,44 +1,48 @@
 import { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
-import { socket } from "../lib/socket"; // ✅ ADD
+
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
-  const {
-    messages,
-    getMessages,
-    selectedUser,
-    isMessagesLoading,
-    addMessage, // ✅ ADD
-  } = useChatStore();
+  const { messages, getMessages, selectedUser, isMessagesLoading, addMessage } =
+    useChatStore();
 
-  const { authUser } = useAuthStore();
+  const { authUser, socket } = useAuthStore();
   const messageEndRef = useRef(null);
 
+  
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id);
     }
-  }, [selectedUser]);
+  }, [selectedUser, getMessages]);
 
-  // ✅ SOCKET LISTENER
+
   useEffect(() => {
-    socket.on("receiveMessage", (newMessage) => {
-      if (newMessage.senderId.toString() === selectedUser?._id.toString()) {
+    if (!socket || !selectedUser) return;
+
+    const handleNewMessage = (newMessage) => {
+      if (newMessage.senderId.toString() === selectedUser._id.toString()) {
         addMessage(newMessage);
       }
-    });
+    };
 
-    return () => socket.off("receiveMessage");
-  }, [selectedUser]);
+    socket.on("receiveMessage", handleNewMessage);
 
-  // auto scroll
+    return () => {
+      socket.off("receiveMessage", handleNewMessage);
+    };
+  }, [socket, selectedUser, addMessage]);
+
+
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messageEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
   }, [messages]);
 
   if (!selectedUser) return null;
@@ -74,7 +78,7 @@ const ChatContainer = () => {
                         ? authUser?.profilePic || "/avatar.png"
                         : selectedUser?.profilePic || "/avatar.png"
                     }
-                    alt="profile pic"
+                    alt="profile"
                   />
                 </div>
               </div>
@@ -89,7 +93,8 @@ const ChatContainer = () => {
                 {message.image && (
                   <img
                     src={message.image}
-                    className="sm:max-w-50 rounded-md mb-2"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                    alt=""
                   />
                 )}
                 {message.text && <p>{message.text}</p>}
@@ -97,6 +102,7 @@ const ChatContainer = () => {
             </div>
           );
         })}
+
         <div ref={messageEndRef} />
       </div>
 

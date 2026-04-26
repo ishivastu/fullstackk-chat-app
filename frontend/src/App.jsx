@@ -10,7 +10,6 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
-import { socket } from "./lib/socket"; // ✅ ADD
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -20,10 +19,9 @@ const App = () => {
     checkAuth();
   }, [checkAuth]);
 
-  // ✅ JOIN ROOM
   useEffect(() => {
     if (authUser?._id) {
-      socket.emit("join", authUser._id);
+
     }
   }, [authUser]);
 
@@ -36,7 +34,7 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-base-100 text-base-content">
+    <div data-theme={theme} className="min-h-screen bg-base-100 text-base-content">
       <Navbar />
 
       <Routes>

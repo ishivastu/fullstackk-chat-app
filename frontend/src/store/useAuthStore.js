@@ -15,7 +15,7 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
   socket: null,
 
-  
+
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
@@ -82,7 +82,7 @@ export const useAuthStore = create((set, get) => ({
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.put("/auth/update-profile", data);
+      const res = await axiosInstance.put("/auth/updateprofile", data);
 
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
@@ -100,7 +100,6 @@ export const useAuthStore = create((set, get) => ({
 
     if (!authUser) return;
 
-    // 🔥 prevent duplicate sockets
     if (socket) {
       socket.disconnect();
     }

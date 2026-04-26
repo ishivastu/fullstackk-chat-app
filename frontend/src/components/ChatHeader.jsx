@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, Bot } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 
@@ -6,42 +6,54 @@ const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
   const { onlineUsers } = useAuthStore();
 
-  // ✅ prevent crash
-  if (!selectedUser) return null;
 
-  const isOnline = onlineUsers?.includes(selectedUser._id);
+  const isAIChat = selectedUser?._id === "ai-chat";
+
+
+  const isOnline = isAIChat ? true : onlineUsers.includes(selectedUser?._id);
 
   return (
-    <div className="p-2.5 border-b border-base-300">
+    <div className="px-5 py-4 border-b border-base-300 bg-base-100 shadow-sm">
       <div className="flex items-center justify-between">
-        {/* LEFT SIDE */}
-        <div className="flex items-center gap-3">
+        {/* Left Side */}
+        <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="avatar">
-            <div className="size-10 rounded-full relative">
-              <img
-                src={selectedUser.profilePic || "/avatar.png"}
-                alt={selectedUser.fullName}
-              />
-            </div>
-          </div>
+          {isAIChat ? (
+            <img
+              src="/bot.png"
+              alt="AI Assistant"
+              className="size-12 rounded-full object-cover border"
+            />
+          ) : (
+            <img
+              src={selectedUser?.profilePic || "/avatar.png"}
+              alt={selectedUser?.fullName}
+              className="size-12 rounded-full object-cover border"
+            />
+          )}
 
-          {/* User Info */}
+
           <div>
-            <h3 className="font-medium">{selectedUser.fullName}</h3>
+            <h2 className="font-semibold text-base">
+              {isAIChat ? "AI Assistant" : selectedUser?.fullName}
+            </h2>
 
-            <p className="text-sm text-base-content/70">
-              {isOnline ? "🟢 Online" : "⚫ Offline"}
+            <p
+              className={`text-sm font-medium ${
+                isOnline ? "text-green-500" : "text-gray-400"
+              }`}
+            >
+              {isAIChat ? "Always Online" : isOnline ? "Online" : "Offline"}
             </p>
           </div>
         </div>
 
-        {/* RIGHT SIDE (close button) */}
+        {/* Right Side */}
         <button
           onClick={() => setSelectedUser(null)}
-          className="btn btn-sm btn-circle"
+          className="p-2 rounded-full hover:bg-base-200 transition"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
       </div>
     </div>
