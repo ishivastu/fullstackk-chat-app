@@ -1,3 +1,5 @@
+// controllers/messageController.js
+
 import User from "../models/userModel.js";
 import Message from "../models/messageModel.js";
 import cloudinary from "../lib/cloudinary.js";
@@ -15,7 +17,7 @@ const openai = new OpenAI({
 
 export const getSideUsers = async (req, res) => {
   try {
-    const myId = req.user._id;
+    const myId = req.user._id.toString();
 
     if (!myId) {
       return res.status(400).json({
@@ -39,10 +41,10 @@ export const getSideUsers = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   try {
-    const myId = req.user._id;
+    const myId = req.user._id.toString();
     const { id } = req.params;
 
-
+    // AI Chat
     if (id === "ai-chat") {
       const messages = await Message.find({
         $or: [
@@ -60,7 +62,7 @@ export const getMessages = async (req, res) => {
       return res.status(200).json(messages);
     }
 
-
+    // Normal Chat
     const messages = await Message.find({
       $or: [
         {
@@ -88,16 +90,17 @@ export const sendMessages = async (req, res) => {
   try {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
-    const senderId = req.user._id;
+    const senderId = req.user._id.toString();
 
-
+    // =========================
+    // AI CHAT
+    // =========================
     if (receiverId === "ai-chat") {
       if (!text || !text.trim()) {
         return res.status(400).json({
           message: "Message text is required",
         });
       }
-
 
       const userMessage = new Message({
         senderId,
@@ -107,7 +110,6 @@ export const sendMessages = async (req, res) => {
       });
 
       await userMessage.save();
-
 
       const completion = await openai.chat.completions.create({
         model: "openrouter/auto",
@@ -140,6 +142,9 @@ export const sendMessages = async (req, res) => {
       return res.status(201).json(userMessage);
     }
 
+    // =========================
+    // NORMAL USER CHAT
+    // =========================
 
     let imageUrl = "";
 
@@ -158,15 +163,15 @@ export const sendMessages = async (req, res) => {
 
     await newMessage.save();
 
-
+    // receiver socket
     const receiverSocketId = getReceiverSocketId(receiverId);
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("receiveMessage", newMessage);
     }
 
-  
-    const senderSocketId = getReceiverSocketId(senderId.toString());
+    // sender socket
+    const senderSocketId = getReceiverSocketId(senderId);
 
     if (senderSocketId) {
       io.to(senderSocketId).emit("receiveMessage", newMessage);

@@ -1,5 +1,3 @@
-// useChatStore.js
-
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
@@ -39,24 +37,22 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  // FIXED: no manual set() here
+  // socket event will handle real-time UI update
   sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get();
+    const { selectedUser } = get();
 
     try {
-      const res = await axiosInstance.post(
+      await axiosInstance.post(
         `/messages/send/${selectedUser._id}`,
-        messageData,
+        messageData
       );
-
-      // instant UI update
-      set({
-        messages: [...messages, res.data],
-      });
     } catch (error) {
       toast.error("Error sending message");
     }
   },
 
+  // socket adds messages here
   addMessage: (message) =>
     set((state) => ({
       messages: [...state.messages, message],
