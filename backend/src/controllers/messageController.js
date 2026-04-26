@@ -42,7 +42,7 @@ export const getMessages = async (req, res) => {
     const myId = req.user._id;
     const { id } = req.params;
 
-
+    // AI Chat messages
     if (id === "ai-chat") {
       const messages = await Message.find({
         $or: [
@@ -60,8 +60,7 @@ export const getMessages = async (req, res) => {
       return res.status(200).json(messages);
     }
 
-
-
+    // Normal user-to-user messages
     const messages = await Message.find({
       $or: [
         {
@@ -91,7 +90,9 @@ export const sendMessages = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
-
+    // =========================
+    // AI CHAT
+    // =========================
     if (receiverId === "ai-chat") {
       if (!text || !text.trim()) {
         return res.status(400).json({
@@ -99,7 +100,7 @@ export const sendMessages = async (req, res) => {
         });
       }
 
-
+      // Save user message
       const userMessage = new Message({
         senderId,
         receiverId: "ai-chat",
@@ -109,7 +110,7 @@ export const sendMessages = async (req, res) => {
 
       await userMessage.save();
 
-
+      // Generate AI response
       const completion = await openai.chat.completions.create({
         model: "openrouter/auto",
         messages: [
@@ -129,7 +130,7 @@ export const sendMessages = async (req, res) => {
         completion?.choices?.[0]?.message?.content ||
         "Sorry, I couldn't generate a response.";
 
-
+      // Save AI reply
       const botMessage = new Message({
         senderId: "ai-chat",
         receiverId: senderId,
@@ -139,16 +140,16 @@ export const sendMessages = async (req, res) => {
 
       await botMessage.save();
 
-
       return res.status(201).json(userMessage);
     }
 
+
+    
 
     let imageUrl = "";
 
     if (image) {
       const uploadResponse = await cloudinary.uploader.upload(image);
-
       imageUrl = uploadResponse.secure_url;
     }
 
@@ -162,11 +163,16 @@ export const sendMessages = async (req, res) => {
 
     await newMessage.save();
 
-
     const receiverSocketId = getReceiverSocketId(receiverId);
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("receiveMessage", newMessage);
+    }
+
+    const senderSocketId = getReceiverSocketId(senderId.toString());
+
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("receiveMessage", newMessage);
     }
 
     return res.status(201).json(newMessage);
