@@ -1,3 +1,5 @@
+// ChatContainer.jsx
+
 import { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -14,19 +16,23 @@ const ChatContainer = () => {
   const { authUser, socket } = useAuthStore();
   const messageEndRef = useRef(null);
 
-  
+  // Fetch old messages when user is selected
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id);
     }
   }, [selectedUser, getMessages]);
 
-
+  // Real-time socket listener (FIXED)
   useEffect(() => {
     if (!socket || !selectedUser) return;
 
     const handleNewMessage = (newMessage) => {
-      if (newMessage.senderId.toString() === selectedUser._id.toString()) {
+      const isMessageForCurrentChat =
+        newMessage.senderId.toString() === selectedUser._id.toString() ||
+        newMessage.receiverId.toString() === selectedUser._id.toString();
+
+      if (isMessageForCurrentChat) {
         addMessage(newMessage);
       }
     };
@@ -38,7 +44,7 @@ const ChatContainer = () => {
     };
   }, [socket, selectedUser, addMessage]);
 
-
+  // Auto scroll
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -97,6 +103,7 @@ const ChatContainer = () => {
                     alt=""
                   />
                 )}
+
                 {message.text && <p>{message.text}</p>}
               </div>
             </div>
