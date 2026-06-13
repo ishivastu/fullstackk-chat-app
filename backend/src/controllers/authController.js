@@ -68,10 +68,11 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    generateToken(user._id, res);
+    const token=generateToken(user._id, res);
 
     res.status(200).json({
       message: "Login successful",
+      token:token,
       user: {
         id: user._id,
         fullName: user.fullName,
@@ -113,5 +114,12 @@ export const updateProfile = async (req, res) => {
 };
 
 export const check = (req, res) => {
-  res.json(req.user);
+  res.status(200).json({
+    user: {
+      id: req.user._id,
+      fullName: req.user.fullName,
+      email: req.user.email,
+      profilePic: req.user.profilePic,
+    },
+  });
 };
