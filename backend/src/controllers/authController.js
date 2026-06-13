@@ -122,7 +122,7 @@ export const check = (req, res) => {
       fullName: req.user.fullName,
       email: req.user.email,
       profilePic: req.user.profilePic,
-      createdAt: user.createdAt,
+      createdAt: req.user.createdAt,
     },
   });
 };
