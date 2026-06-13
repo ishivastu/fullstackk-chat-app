@@ -40,6 +40,7 @@ export const signup = async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         profilePic: user.profilePic,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -78,6 +79,7 @@ export const login = async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         profilePic: user.profilePic,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -120,6 +122,7 @@ export const check = (req, res) => {
       fullName: req.user.fullName,
       email: req.user.email,
       profilePic: req.user.profilePic,
+      createdAt: user.createdAt,
     },
   });
 };
