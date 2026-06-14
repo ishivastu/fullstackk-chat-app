@@ -24,6 +24,7 @@ io.on("connection", (socket) => {
 
   if (userId) {
     userSocketMap[userId] = socket.id;
+    console.log(userId);
   }
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
