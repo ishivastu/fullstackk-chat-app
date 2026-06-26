@@ -15,7 +15,7 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.set("trust proxy", 1); // trust first proxy
+app.set("trust proxy", true); // trust first proxy
 
 import authRoutes from "./routes/authRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
