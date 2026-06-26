@@ -5,6 +5,11 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
   try {
+
+    console.log({
+      ip: req.ip,
+      forwarded: req.headers["x-forwarded-for"],
+    });
     const { email, password, fullName } = req.body;
 
     console.log("BODY:", req.body);
@@ -51,6 +56,10 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    console.log({
+      ip: req.ip,
+      forwarded: req.headers["x-forwarded-for"],
+    });
     const { email, password } = req.body;
 
     if (!email || !password) {

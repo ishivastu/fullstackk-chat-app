@@ -1,16 +1,23 @@
-import rateLimit from "express-rate-limit";
+import { ratelimit } from "../lib/upstash.js";
 
-const rateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
+const rateLimiter = async (req, res, next) => {
+  const identifier = req.ip;
 
-  handler: (req, res) => {
-    console.log("Rate limit exceeded for:", req.ip);
+  const { success, limit, remaining, reset } =
+    await ratelimit.limit(identifier);
 
-    res.status(429).json({
-      message: "Too many requests",
+  res.setHeader("X-RateLimit-Limit", limit);
+  res.setHeader("X-RateLimit-Remaining", remaining);
+  res.setHeader("X-RateLimit-Reset", reset);
+
+  if (!success) {
+    return res.status(429).json({
+      success: false,
+      message: "Too many requests. Try again after 15 minutes.",
     });
-  },
-});
+  }
+
+  next();
+};
 
 export default rateLimiter;
