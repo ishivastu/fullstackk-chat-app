@@ -8,12 +8,8 @@ const rateLimiter = async (req, res, next) => {
 
     console.log("Identifier:", identifier);
 
-    const { success, limit, remaining, reset } =
+    const { success } =
       await ratelimit.limit(identifier);
-
-    res.setHeader("X-RateLimit-Limit", limit);
-    res.setHeader("X-RateLimit-Remaining", remaining);
-    res.setHeader("X-RateLimit-Reset", reset);
 
     if (!success) {
       return res.status(429).json({

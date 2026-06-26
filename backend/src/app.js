@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+console.log("CLIENT_URL:", process.env.CLIENT_URL);
+
 
 app.use(
   cors({
