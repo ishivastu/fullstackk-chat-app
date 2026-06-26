@@ -1,4 +1,4 @@
-import { ratelimit } from "../lib/upstash.js";
+import { ratelimit } from "../lib/redis.js";
 
 const rateLimiter = async (req, res, next) => {
   const identifier = req.ip;
