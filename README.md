@@ -2,6 +2,8 @@
 
 A full-stack MERN real-time chat application with authentication, one-to-one messaging, image sharing, online user presence, customizable themes, and an AI assistant chat powered through OpenRouter/OpenAI-compatible APIs.
 
+🔗 **Live Demo:** [https://fullstackk-chat-app-2.onrender.com/](https://fullstackk-chat-app-2.onrender.com/)
+
 ## Table of Contents
 
 - [Features](#features)
